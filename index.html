@@ -1,0 +1,1390 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copa da Escola - Painel para URE</title>
+    <style>
+      :root {
+        --bg: #07110b;
+        --bg-2: #0b1d13;
+        --panel: rgba(13, 38, 23, 0.92);
+        --panel-soft: rgba(17, 46, 28, 0.92);
+        --panel-strong: rgba(22, 57, 35, 0.98);
+        --line: rgba(222, 245, 228, 0.12);
+        --line-strong: rgba(255, 210, 86, 0.28);
+        --text: #f4f7f2;
+        --muted: #a9bfae;
+        --gold: #f7c84f;
+        --gold-2: #ffd95e;
+        --green: #7cd36b;
+        --green-2: #1d7f4a;
+        --shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(247, 200, 79, 0.18), transparent 24%),
+          radial-gradient(circle at 100% 0, rgba(124, 211, 107, 0.16), transparent 28%),
+          linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.22;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent 92%);
+      }
+
+      .page {
+        width: min(1380px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 16px 0 28px;
+      }
+
+      .hero,
+      .section {
+        position: relative;
+        overflow: visible;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background:
+          linear-gradient(135deg, rgba(255, 210, 86, 0.08), transparent 34%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent),
+          var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(250px, 420px);
+        gap: 14px;
+        align-items: center;
+        padding: 12px 16px;
+      }
+
+      .hero::after,
+      .section::after {
+        content: "";
+        position: absolute;
+        inset: auto -76px -76px auto;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        border: 28px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .hero-copy {
+        position: relative;
+        z-index: 1;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        padding: 6px 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        background: rgba(247, 200, 79, 0.09);
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .tag::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--gold);
+        box-shadow: 0 0 0 6px rgba(247, 200, 79, 0.12);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 3.2vw, 46px);
+        line-height: 0.92;
+        letter-spacing: -0.04em;
+      }
+
+      .subtitle {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .stamp {
+        margin-top: 8px;
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stamp strong {
+        color: var(--text);
+      }
+
+      .brand {
+        position: relative;
+        z-index: 1;
+        justify-self: end;
+        width: min(100%, 330px);
+        padding: 8px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background:
+          radial-gradient(circle at top, rgba(255, 210, 86, 0.18), transparent 52%),
+          rgba(255, 255, 255, 0.03);
+      }
+
+      .brand img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .section {
+        margin-top: 16px;
+        padding: 12px;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 16px;
+        margin-bottom: 10px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 24px;
+        letter-spacing: -0.03em;
+      }
+
+      .head-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .tabs {
+        display: inline-flex;
+        gap: 8px;
+        padding: 4px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .tab-button {
+        height: 38px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .tab-button.active {
+        background: rgba(247, 200, 79, 0.16);
+        color: var(--gold-2);
+      }
+
+      .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: end;
+        margin-bottom: 12px;
+      }
+
+      .field {
+        min-width: 140px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      select,
+      input[type="search"] {
+        width: 100%;
+        height: 42px;
+        padding: 0 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font: inherit;
+      }
+
+      select option {
+        color: #111111;
+        background: #ffffff;
+      }
+
+      select[multiple] {
+        height: 96px;
+        padding: 8px 10px;
+      }
+
+      input[type="search"]::placeholder {
+        color: #87a08f;
+      }
+
+      .search-field {
+        min-width: 250px;
+        margin-left: auto;
+      }
+
+      .search-field-inline {
+        min-width: 320px;
+      }
+
+      .view-control {
+        min-width: 220px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .field-multi {
+        position: relative;
+        min-width: 220px;
+      }
+
+      .multi-trigger {
+        width: 100%;
+        height: 42px;
+        padding: 0 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .multi-trigger::after {
+        content: "v";
+        float: right;
+        color: var(--gold-2);
+      }
+
+      .multi-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        z-index: 30;
+        width: 100%;
+        min-width: 240px;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        background: #143622;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+        display: none;
+      }
+
+      .multi-panel.open {
+        display: block;
+      }
+
+      .multi-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .multi-actions button {
+        border: 0;
+        background: transparent;
+        color: var(--gold-2);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .multi-options {
+        display: grid;
+        gap: 6px;
+        max-height: 220px;
+        overflow: auto;
+      }
+
+      .multi-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+      }
+
+      .multi-option input {
+        accent-color: var(--gold-2);
+      }
+
+      .icon-button,
+      .file-button {
+        height: 42px;
+        padding: 0 14px;
+        border: 1px solid var(--line-strong);
+        border-radius: 14px;
+        background: rgba(247, 200, 79, 0.09);
+        color: var(--gold-2);
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .icon-button {
+        width: 48px;
+        padding: 0;
+        font-size: 20px;
+      }
+
+      .file-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .file-button input {
+        display: none;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        min-height: 88px;
+        padding: 11px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),
+          var(--panel-soft);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: auto -16px -40px auto;
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(247, 200, 79, 0.28), transparent 70%);
+      }
+
+      .card-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .card-value {
+        margin: 8px 0 2px;
+        font-size: clamp(24px, 2.1vw, 34px);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      .card-meta {
+        margin: 0;
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .table-shell {
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        margin-top: 8px;
+      }
+
+      .table-wrap {
+        overflow: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 1160px;
+        border-collapse: collapse;
+      }
+
+      thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 12px 12px;
+        background: #173a26;
+        color: #ecf5ef;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-align: left;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      thead th:hover {
+        background: #1c442d;
+      }
+
+      thead th.active-sort {
+        color: var(--gold-2);
+      }
+
+      tbody td {
+        padding: 11px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        white-space: nowrap;
+      }
+
+      tbody tr:nth-child(odd) {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      tbody tr:hover {
+        background: rgba(247, 200, 79, 0.08);
+      }
+
+      .rank {
+        width: 70px;
+        text-align: center;
+        font-weight: 900;
+        color: var(--gold-2);
+      }
+
+      .regional {
+        min-width: 220px;
+        font-weight: 800;
+      }
+
+      .number {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      thead th.number,
+      tbody td.number,
+      thead th.rank,
+      tbody td.rank {
+        text-align: center;
+      }
+
+      .score-badge {
+        display: inline-flex;
+        min-width: 70px;
+        justify-content: center;
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: rgba(247, 200, 79, 0.12);
+        color: var(--gold-2);
+        font-weight: 900;
+      }
+
+      .loading,
+      .notice {
+        padding: 24px;
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        text-align: center;
+      }
+
+      .notice {
+        color: #f3f4d7;
+        border-color: var(--line-strong);
+        background: rgba(247, 200, 79, 0.08);
+      }
+
+      .notice strong {
+        color: var(--gold-2);
+      }
+
+      .footer-note {
+        margin: 14px 2px 0;
+        color: #8ea594;
+        font-size: 13px;
+      }
+
+      @media (max-width: 1220px) {
+        .cards {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .brand {
+          justify-self: stretch;
+          width: 100%;
+        }
+
+        .search-field {
+          margin-left: 0;
+        }
+
+        .search-field-inline {
+          min-width: 100%;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          width: min(100% - 18px, 1380px);
+          padding-top: 18px;
+        }
+
+        .hero,
+        .section {
+          padding: 18px;
+          border-radius: 22px;
+        }
+
+        .cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .section-head {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="tag">Painel para URE</div>
+          <h1>Copa da Escola</h1>
+          <div class="stamp">Atualizacao: <strong id="today-date"></strong></div>
+        </div>
+
+        <div class="brand" aria-label="Marca da Copa da Escola">
+          <img src="./assets/logo-copa-da-escola.png" alt="Logo Copa da Escola" />
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2 id="summary-title">SEDUC</h2>
+        </div>
+
+        <div class="filter-row">
+          <div class="field">
+            <label for="filter-fase">Fase</label>
+            <select id="filter-fase"></select>
+          </div>
+          <div class="field">
+            <label for="filter-rodada">Rodada</label>
+            <select id="filter-rodada"></select>
+          </div>
+          <div class="field field-multi">
+            <label for="filter-serie-trigger">Serie</label>
+            <button class="multi-trigger" id="filter-serie-trigger" type="button">Todos</button>
+            <div class="multi-panel" id="filter-serie-panel">
+              <div class="multi-actions">
+                <button id="select-all-series" type="button">Marcar todas</button>
+                <button id="clear-series" type="button">Limpar</button>
+              </div>
+              <div class="multi-options" id="filter-serie-options"></div>
+            </div>
+          </div>
+          <button class="icon-button" id="clear-filters" type="button" title="Limpar filtros" aria-label="Limpar filtros">&#8635;</button>
+          <label class="file-button" for="csv-input">
+            Carregar CSV
+            <input id="csv-input" type="file" accept=".csv,text/csv" />
+          </label>
+        </div>
+
+        <div class="cards" id="summary-cards">
+          <div class="loading">Carregando indicadores...</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">          <div class="tabs" aria-label="Abas de visualizacao">
+            <button class="tab-button active" id="tab-seduc" type="button">SEDUC</button>
+            <button class="tab-button" id="tab-ure" type="button">URE</button>
+            <button class="tab-button" id="tab-escola" type="button">Escola</button>
+          </div>
+          <div class="field view-control hidden" id="ure-regional-field">
+            <label for="filter-ure-regional">Regional</label>
+            <select id="filter-ure-regional"></select>
+          </div>
+          <div class="field view-control hidden" id="escola-field">
+            <label for="filter-escola">Escola</label>
+            <select id="filter-escola"></select>
+          </div>
+          <div class="field search-field search-field-inline">
+            <label for="search-regional">Regional</label>
+            <input id="search-regional" type="search" placeholder="Buscar regional..." />
+          </div>
+        </div>
+
+        <div class="table-shell">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr id="table-head"></tr>
+              </thead>
+              <tbody id="table-body">
+                <tr>
+                  <td colspan="8">
+                    <div class="loading">Carregando tabela...</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p class="footer-note" id="footer-note"></p>
+      </section>
+    </main>
+
+    <script>
+      const CSV_PATH = "./data/copa-da-escola.csv";
+      const DEFAULT_FILTERS = { Fase: "1", Rodada: "1", Serie: [] };
+      const seducColumns = [
+        { key: "rank", label: "#", sortable: false, className: "rank" },
+        { key: "regional", label: "Regional", sortable: true, className: "regional" },
+        { key: "totalEscolas", label: "Total de escolas", sortable: true, className: "number" },
+        { key: "totalTurmas", label: "Total de turmas", sortable: true, className: "number" },
+        { key: "pontuacao", label: "Pontuacao", sortable: true, className: "number" },
+        { key: "frequencia", label: "Frequencia", sortable: true, className: "number" },
+        { key: "tarefas", label: "Tarefas", sortable: true, className: "number" },
+        { key: "acertos", label: "Acertos", sortable: true, className: "number" }
+      ];
+
+      const ureColumns = [
+        { key: "rank", label: "#", sortable: false, className: "rank" },
+        { key: "escola", label: "Escola", sortable: true, className: "regional" },
+        { key: "totalTurmas", label: "Total de turmas", sortable: true, className: "number" },
+        { key: "pontuacao", label: "Pontuacao", sortable: true, className: "number" },
+        { key: "frequencia", label: "Frequencia", sortable: true, className: "number" },
+        { key: "tarefas", label: "Tarefas", sortable: true, className: "number" },
+        { key: "acertos", label: "Acertos", sortable: true, className: "number" }
+      ];
+
+      const escolaColumns = [
+        { key: "rank", label: "#", sortable: false, className: "rank" },
+        { key: "turma", label: "Turma", sortable: true, className: "regional" },
+        { key: "pontuacao", label: "Pontuacao", sortable: true, className: "number" },
+        { key: "frequencia", label: "Frequencia", sortable: true, className: "number" },
+        { key: "tarefas", label: "Tarefas", sortable: true, className: "number" },
+        { key: "acertos", label: "Acertos", sortable: true, className: "number" }
+      ];
+
+      const summaryCards = document.getElementById("summary-cards");
+      const summaryTitle = document.getElementById("summary-title");
+      const tableHead = document.getElementById("table-head");
+      const tableBody = document.getElementById("table-body");
+      const tableTitle = document.getElementById("table-title");
+      const footerNote = document.getElementById("footer-note");
+      const todayDate = document.getElementById("today-date");
+      const csvInput = document.getElementById("csv-input");
+      const searchRegional = document.getElementById("search-regional");
+      const tabSeduc = document.getElementById("tab-seduc");
+      const tabUre = document.getElementById("tab-ure");
+      const tabEscola = document.getElementById("tab-escola");
+      const ureRegionalField = document.getElementById("ure-regional-field");
+      const filterUreRegional = document.getElementById("filter-ure-regional");
+      const escolaField = document.getElementById("escola-field");
+      const filterEscola = document.getElementById("filter-escola");
+      const filterFase = document.getElementById("filter-fase");
+      const filterRodada = document.getElementById("filter-rodada");
+      const filterSerieTrigger = document.getElementById("filter-serie-trigger");
+      const filterSeriePanel = document.getElementById("filter-serie-panel");
+      const filterSerieOptions = document.getElementById("filter-serie-options");
+      const selectAllSeries = document.getElementById("select-all-series");
+      const clearSeries = document.getElementById("clear-series");
+      const clearFilters = document.getElementById("clear-filters");
+
+      const state = {
+        rawRows: [],
+        groupedRows: [],
+        seriesOptions: [],
+        activeView: "seduc",
+        sort: { key: "pontuacao", direction: "desc" }
+      };
+
+      todayDate.textContent = new Intl.DateTimeFormat("pt-BR").format(new Date("2026-03-19T12:00:00"));
+
+      function dedupeHeaders(headers) {
+        const counts = new Map();
+        return headers.map((header) => {
+          const clean = header.trim();
+          const total = counts.get(clean) || 0;
+          counts.set(clean, total + 1);
+          return total === 0 ? clean : `${clean}_${total}`;
+        });
+      }
+
+      function parseCsvLine(line) {
+        const result = [];
+        let current = "";
+        let quoted = false;
+
+        for (let index = 0; index < line.length; index += 1) {
+          const char = line[index];
+          const next = line[index + 1];
+
+          if (char === '"' && quoted && next === '"') {
+            current += '"';
+            index += 1;
+            continue;
+          }
+
+          if (char === '"') {
+            quoted = !quoted;
+            continue;
+          }
+
+          if (char === "," && !quoted) {
+            result.push(current);
+            current = "";
+            continue;
+          }
+
+          current += char;
+        }
+
+        result.push(current);
+        return result;
+      }
+
+      function parseCsv(text) {
+        const lines = text
+          .replace(/^\uFEFF/, "")
+          .split(/\r?\n/)
+          .filter((line) => line.trim().length > 0);
+
+        if (!lines.length) return [];
+
+        const headers = dedupeHeaders(parseCsvLine(lines[0]));
+
+        return lines.slice(1).map((line) => {
+          const values = parseCsvLine(line);
+          return headers.reduce((record, header, index) => {
+            record[header] = values[index] ?? "";
+            return record;
+          }, {});
+        });
+      }
+
+      function toNumber(value) {
+        const parsed = Number(String(value).replace(",", "."));
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function formatInteger(value) {
+        return new Intl.NumberFormat("pt-BR").format(value);
+      }
+
+      function formatScore(value) {
+        return value.toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      function average(rows, field) {
+        if (!rows.length) return 0;
+        const sum = rows.reduce((total, row) => total + toNumber(row[field]), 0);
+        return sum / rows.length;
+      }
+
+      function uniqueCount(rows, field) {
+        return new Set(rows.map((row) => row[field]).filter(Boolean)).size;
+      }
+
+      function getSerieValue(row) {
+        return row.nr_serie || row.nr_serie_1 || "";
+      }
+
+      function getSerieLabel(value) {
+        return (
+          {
+            "6": "6o ano",
+            "7": "7o ano",
+            "8": "8o ano",
+            "9": "9o ano",
+            "1": "1a serie",
+            "2": "2a serie",
+            "3": "3a serie"
+          }[String(value)] || String(value)
+        );
+      }
+
+      function getOrderedSeries(rows) {
+        const desiredOrder = ["6", "7", "8", "9", "1", "2", "3"];
+        const available = new Set(rows.map((row) => getSerieValue(row)).filter(Boolean));
+        return desiredOrder.filter((value) => available.has(value));
+      }
+
+      function getSelectedSeries() {
+        return Array.from(
+          filterSerieOptions.querySelectorAll("input[type='checkbox']:checked")
+        ).map((input) => input.value);
+      }
+
+      function updateSeriesTrigger() {
+        const selected = getSelectedSeries();
+
+        if (!selected.length || selected.length === state.seriesOptions.length) {
+          filterSerieTrigger.textContent = "Todos";
+          return;
+        }
+
+        filterSerieTrigger.textContent = selected.map((value) => getSerieLabel(value)).join(", ");
+      }
+
+      function getUniqueValues(rows, field, sortAsNumber = false) {
+        const values = Array.from(new Set(rows.map((row) => row[field]).filter(Boolean)));
+        if (sortAsNumber) {
+          return values.sort((a, b) => Number(a) - Number(b));
+        }
+        return values.sort((a, b) => String(a).localeCompare(String(b), "pt-BR"));
+      }
+
+      function fillSelect(select, values, defaultValue, withAll = false) {
+        const options = [];
+        if (withAll) options.push(`<option value="Todos">Todos</option>`);
+        options.push(
+          ...values.map((value) => `<option value="${value}">${value}</option>`)
+        );
+        select.innerHTML = options.join("");
+
+        if (select.multiple) {
+          const selectedValues = Array.isArray(defaultValue) ? defaultValue : [];
+          Array.from(select.options).forEach((option) => {
+            option.selected = selectedValues.includes(option.value);
+          });
+          return;
+        }
+
+        select.value = defaultValue;
+      }
+
+      function buildFilters(rows) {
+        fillSelect(filterFase, getUniqueValues(rows, "Fase", true), DEFAULT_FILTERS.Fase);
+        fillSelect(filterRodada, getUniqueValues(rows, "Rodada", true), DEFAULT_FILTERS.Rodada);
+        fillSelect(filterUreRegional, getUniqueValues(rows, "NM_DIRETORIA"), "");
+        if (!filterUreRegional.value && filterUreRegional.options.length) {
+          filterUreRegional.value = filterUreRegional.options[0].value;
+        }
+        fillSchoolSelect(rows, filterUreRegional.value);
+        state.seriesOptions = getOrderedSeries(rows);
+        filterSerieOptions.innerHTML = state.seriesOptions
+          .map(
+            (value) => `
+              <label class="multi-option">
+                <input type="checkbox" value="${value}" />
+                <span>${getSerieLabel(value)}</span>
+              </label>
+            `
+          )
+          .join("");
+
+        filterSerieOptions.querySelectorAll("input[type='checkbox']").forEach((input) => {
+          input.addEventListener("change", () => {
+            updateSeriesTrigger();
+            renderDashboard();
+          });
+        });
+
+        updateSeriesTrigger();
+      }
+
+      function fillSchoolSelect(rows, regional) {
+        const schools = Array.from(
+          new Map(
+            rows
+              .filter((row) => (row.NM_DIRETORIA || "").trim() === regional)
+              .map((row) => [
+                row.CD_ESCOLA,
+                (row.NM_COMPLETO_ESCOLA || "Nao informado").trim()
+              ])
+          ).values()
+        ).sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+        fillSelect(filterEscola, schools, "");
+        if (!filterEscola.value && filterEscola.options.length) {
+          filterEscola.value = filterEscola.options[0].value;
+        }
+      }
+
+      function getFilteredRows() {
+        const selectedSeries = getSelectedSeries();
+
+        return state.rawRows.filter((row) => {
+          const faseOk = row.Fase === filterFase.value;
+          const rodadaOk = row.Rodada === filterRodada.value;
+          const serieOk = !selectedSeries.length || selectedSeries.includes(getSerieValue(row));
+          return faseOk && rodadaOk && serieOk;
+        });
+      }
+
+      function groupBySchool(rows, regional) {
+        const scopedRows = rows.filter((row) => (row.NM_DIRETORIA || "").trim() === regional);
+
+        return Object.values(
+          scopedRows.reduce((accumulator, row) => {
+            const schoolKey = `${row.CD_ESCOLA}-${(row.NM_COMPLETO_ESCOLA || "Nao informado").trim()}`;
+            if (!accumulator[schoolKey]) {
+              accumulator[schoolKey] = {
+                escola: (row.NM_COMPLETO_ESCOLA || "Nao informado").trim(),
+                rows: []
+              };
+            }
+            accumulator[schoolKey].rows.push(row);
+            return accumulator;
+          }, {})
+        ).map((group) => ({
+          escola: group.escola,
+          totalTurmas: uniqueCount(group.rows, "cd_turma"),
+          pontuacao: average(group.rows, "PontosTotal"),
+          frequencia: average(group.rows, "PontosFrequencia"),
+          tarefas: average(group.rows, "PontosTarefas"),
+          acertos: average(group.rows, "PontosAcertos")
+        }));
+      }
+
+      function groupByClass(rows, regional, escola) {
+        const scopedRows = rows.filter(
+          (row) =>
+            (row.NM_DIRETORIA || "").trim() === regional &&
+            (row.NM_COMPLETO_ESCOLA || "").trim() === escola
+        );
+
+        return scopedRows.map((row) => ({
+          turma: row.ds_turma || "Nao informado",
+          pontuacao: toNumber(row.PontosTotal),
+          frequencia: toNumber(row.PontosFrequencia),
+          tarefas: toNumber(row.PontosTarefas),
+          acertos: toNumber(row.PontosAcertos)
+        }));
+      }
+
+      function buildSummary(rows) {
+        const cards = [
+          {
+            label: "Total de escolas",
+            value: formatInteger(uniqueCount(rows, "CD_ESCOLA")),
+            meta: "Escolas unicas"
+          },
+          {
+            label: "Total de turmas",
+            value: formatInteger(uniqueCount(rows, "cd_turma")),
+            meta: "Turmas unicas"
+          },
+          {
+            label: "Pontuacao",
+            value: formatScore(average(rows, "PontosTotal")),
+            meta: "Media de pontos totais"
+          },
+          {
+            label: "Frequencia",
+            value: formatScore(average(rows, "PontosFrequencia")),
+            meta: "Media de pontos de frequencia"
+          },
+          {
+            label: "Tarefas",
+            value: formatScore(average(rows, "PontosTarefas")),
+            meta: "Media de pontos de tarefas"
+          },
+          {
+            label: "Acertos",
+            value: formatScore(average(rows, "PontosAcertos")),
+            meta: "Media de pontos de acertos"
+          }
+        ];
+
+        summaryCards.innerHTML = cards
+          .map(
+            (card) => `
+              <article class="card">
+                <p class="card-label">${card.label}</p>
+                <p class="card-value">${card.value}</p>
+                <p class="card-meta">${card.meta}</p>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function groupByRegional(rows) {
+        return Object.values(
+          rows.reduce((accumulator, row) => {
+            const regional = (row.NM_DIRETORIA || "Nao informado").trim();
+            if (!accumulator[regional]) {
+              accumulator[regional] = { regional, rows: [] };
+            }
+            accumulator[regional].rows.push(row);
+            return accumulator;
+          }, {})
+        ).map((group) => ({
+          regional: group.regional,
+          totalEscolas: uniqueCount(group.rows, "CD_ESCOLA"),
+          totalTurmas: uniqueCount(group.rows, "cd_turma"),
+          pontuacao: average(group.rows, "PontosTotal"),
+          frequencia: average(group.rows, "PontosFrequencia"),
+          tarefas: average(group.rows, "PontosTarefas"),
+          acertos: average(group.rows, "PontosAcertos")
+        }));
+      }
+
+      function compareValues(first, second, direction) {
+        if (typeof first === "string") {
+          return direction === "asc"
+            ? first.localeCompare(second, "pt-BR")
+            : second.localeCompare(first, "pt-BR");
+        }
+        return direction === "asc" ? first - second : second - first;
+      }
+
+      function getCurrentColumns() {
+        if (state.activeView === "ure") return ureColumns;
+        if (state.activeView === "escola") return escolaColumns;
+        return seducColumns;
+      }
+
+      function getVisibleRows() {
+        const term = searchRegional.value.trim().toLocaleLowerCase("pt-BR");
+        const nameKey =
+          state.activeView === "ure"
+            ? "escola"
+            : state.activeView === "escola"
+              ? "turma"
+              : "regional";
+        const filtered = !term
+          ? [...state.groupedRows]
+          : state.groupedRows.filter((row) => row[nameKey].toLocaleLowerCase("pt-BR").includes(term));
+
+        const { key, direction } = state.sort;
+        if (key !== "rank") {
+          filtered.sort((a, b) => compareValues(a[key], b[key], direction));
+        }
+
+        return filtered;
+      }
+
+      function renderHead() {
+        const activeColumns = getCurrentColumns();
+
+        tableHead.innerHTML = activeColumns
+          .map((column) => {
+            const activeClass = state.sort.key === column.key ? "active-sort" : "";
+            const arrow = column.sortable
+              ? state.sort.key === column.key
+                ? state.sort.direction === "asc"
+                  ? " ^"
+                  : " v"
+                : " *"
+              : "";
+            return `<th class="${activeClass}" data-key="${column.key}" data-sortable="${column.sortable}">${column.label}${arrow}</th>`;
+          })
+          .join("");
+
+        tableHead.querySelectorAll("th[data-sortable='true']").forEach((header) => {
+          header.addEventListener("click", () => {
+            const key = header.dataset.key;
+            const nextDirection =
+              state.sort.key === key && state.sort.direction === "desc" ? "asc" : "desc";
+            state.sort = { key, direction: nextDirection };
+            renderHead();
+            renderBody();
+          });
+        });
+      }
+
+      function renderBody() {
+        const activeColumns = getCurrentColumns();
+        const visibleRows = getVisibleRows();
+
+        if (!visibleRows.length) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="${activeColumns.length}">
+                <div class="notice">Nenhum resultado encontrado para os filtros aplicados.</div>
+              </td>
+            </tr>
+          `;
+          footerNote.textContent = "";
+          return;
+        }
+
+        tableBody.innerHTML = visibleRows
+          .map(
+            (row, index) => `
+              <tr>
+                <td class="rank">${index + 1}</td>
+                <td class="regional">${row.regional || row.escola || row.turma}</td>
+                ${state.activeView === "seduc" ? `<td class="number">${formatInteger(row.totalEscolas)}</td>` : ""}
+                ${state.activeView !== "escola" ? `<td class="number">${formatInteger(row.totalTurmas)}</td>` : ""}
+                <td class="number"><span class="score-badge">${formatScore(row.pontuacao)}</span></td>
+                <td class="number">${formatScore(row.frequencia)}</td>
+                <td class="number">${formatScore(row.tarefas)}</td>
+                <td class="number">${formatScore(row.acertos)}</td>
+              </tr>
+            `
+          )
+          .join("");
+
+        footerNote.textContent = `${formatInteger(visibleRows.length)} ${state.activeView === "escola" ? "turma(s)" : state.activeView === "ure" ? "escola(s)" : "regional(is)"} exibida(s), ordenadas por ${activeColumns.find((column) => column.key === state.sort.key)?.label.toLowerCase() || "pontuacao"}.`;
+      }
+
+      function renderNotice(message) {
+        summaryCards.innerHTML = `<div class="notice">${message}</div>`;
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="notice">${message}</div>
+            </td>
+          </tr>
+        `;
+      }
+
+      function renderDashboard() {
+        const filteredRows = getFilteredRows();
+        const summaryRows =
+          state.activeView === "ure"
+            ? filteredRows.filter((row) => (row.NM_DIRETORIA || "").trim() === filterUreRegional.value)
+            : state.activeView === "escola"
+              ? filteredRows.filter(
+                  (row) =>
+                    (row.NM_DIRETORIA || "").trim() === filterUreRegional.value &&
+                    (row.NM_COMPLETO_ESCOLA || "").trim() === filterEscola.value
+                )
+            : filteredRows;
+
+        buildSummary(summaryRows);
+        state.groupedRows =
+          state.activeView === "ure"
+            ? groupBySchool(filteredRows, filterUreRegional.value)
+            : state.activeView === "escola"
+              ? groupByClass(filteredRows, filterUreRegional.value, filterEscola.value)
+            : groupByRegional(filteredRows);
+        if (summaryTitle) {
+          summaryTitle.textContent =
+            state.activeView === "escola" && filterEscola.value
+              ? `Escola - ${filterEscola.value}`
+              : state.activeView === "ure" && filterUreRegional.value
+              ? `Regional - ${filterUreRegional.value}`
+              : "SEDUC";
+        }
+        if (tableTitle) {
+          tableTitle.textContent =
+            state.activeView === "escola"
+              ? "Escola"
+              : state.activeView === "ure"
+                ? "URE"
+                : "SEDUC";
+        }
+        renderHead();
+        renderBody();
+      }
+
+      function loadFromText(text, sourceLabel = "arquivo carregado") {
+        state.rawRows = parseCsv(text);
+        buildFilters(state.rawRows);
+        state.sort = { key: "pontuacao", direction: "desc" };
+        searchRegional.value = "";
+        renderDashboard();
+        footerNote.textContent = `${formatInteger(state.groupedRows.length)} regional(is) exibida(s). Fonte: ${sourceLabel}.`;
+      }
+
+      async function loadDashboard() {
+        try {
+          const response = await fetch(CSV_PATH);
+          if (!response.ok) throw new Error(`Falha ao carregar o CSV (${response.status})`);
+          const text = await response.text();
+          loadFromText(text, "CSV da pasta data");
+        } catch (error) {
+          renderNotice("O navegador bloqueou a leitura automatica do CSV local. Use <strong>Carregar CSV</strong> para selecionar a base.");
+          footerNote.textContent = "No GitHub Pages, a leitura do arquivo na pasta data funciona automaticamente.";
+          renderHead();
+        }
+      }
+
+      [filterFase, filterRodada].forEach((select) => {
+        select.addEventListener("change", renderDashboard);
+      });
+
+      clearFilters.addEventListener("click", () => {
+        filterFase.value = DEFAULT_FILTERS.Fase;
+        filterRodada.value = DEFAULT_FILTERS.Rodada;
+        filterSerieOptions.querySelectorAll("input[type='checkbox']").forEach((input) => {
+          input.checked = false;
+        });
+        updateSeriesTrigger();
+        filterSeriePanel.classList.remove("open");
+        searchRegional.value = "";
+        state.sort = { key: "pontuacao", direction: "desc" };
+        renderDashboard();
+      });
+
+      filterSerieTrigger.addEventListener("click", () => {
+        filterSeriePanel.classList.toggle("open");
+      });
+
+      selectAllSeries.addEventListener("click", () => {
+        filterSerieOptions.querySelectorAll("input[type='checkbox']").forEach((input) => {
+          input.checked = true;
+        });
+        updateSeriesTrigger();
+        renderDashboard();
+      });
+
+      clearSeries.addEventListener("click", () => {
+        filterSerieOptions.querySelectorAll("input[type='checkbox']").forEach((input) => {
+          input.checked = false;
+        });
+        updateSeriesTrigger();
+        renderDashboard();
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".field-multi")) {
+          filterSeriePanel.classList.remove("open");
+        }
+      });
+
+      tabSeduc.addEventListener("click", () => {
+        state.activeView = "seduc";
+        state.sort = { key: "pontuacao", direction: "desc" };
+        tabSeduc.classList.add("active");
+        tabUre.classList.remove("active");
+        tabEscola.classList.remove("active");
+        ureRegionalField.classList.add("hidden");
+        escolaField.classList.add("hidden");
+        searchRegional.previousElementSibling.textContent = "Regional";
+        searchRegional.placeholder = "Buscar regional...";
+        searchRegional.value = "";
+        renderDashboard();
+      });
+
+      tabUre.addEventListener("click", () => {
+        state.activeView = "ure";
+        state.sort = { key: "pontuacao", direction: "desc" };
+        tabUre.classList.add("active");
+        tabSeduc.classList.remove("active");
+        tabEscola.classList.remove("active");
+        ureRegionalField.classList.remove("hidden");
+        escolaField.classList.add("hidden");
+        if (!filterUreRegional.value) {
+          filterUreRegional.value = filterUreRegional.options[0]?.value || "";
+        }
+        searchRegional.previousElementSibling.textContent = "Escola";
+        searchRegional.placeholder = "Buscar escola...";
+        searchRegional.value = "";
+        renderDashboard();
+      });
+
+      tabEscola.addEventListener("click", () => {
+        state.activeView = "escola";
+        state.sort = { key: "pontuacao", direction: "desc" };
+        tabEscola.classList.add("active");
+        tabSeduc.classList.remove("active");
+        tabUre.classList.remove("active");
+        ureRegionalField.classList.remove("hidden");
+        escolaField.classList.remove("hidden");
+        if (!filterUreRegional.value) {
+          filterUreRegional.value = filterUreRegional.options[0]?.value || "";
+        }
+        fillSchoolSelect(getFilteredRows(), filterUreRegional.value);
+        searchRegional.previousElementSibling.textContent = "Turma";
+        searchRegional.placeholder = "Buscar turma...";
+        searchRegional.value = "";
+        renderDashboard();
+      });
+
+      searchRegional.addEventListener("input", renderBody);
+      filterUreRegional.addEventListener("change", () => {
+        fillSchoolSelect(getFilteredRows(), filterUreRegional.value);
+        renderDashboard();
+      });
+      filterEscola.addEventListener("change", renderDashboard);
+
+      csvInput.addEventListener("change", async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          loadFromText(text, file.name);
+        } catch (error) {
+          renderNotice("Nao foi possivel ler o CSV selecionado.");
+          footerNote.textContent = "";
+        }
+      });
+
+      renderHead();
+      loadDashboard();
+    </script>
+  </body>
+</html>
+
