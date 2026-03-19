@@ -654,10 +654,6 @@
             </div>
           </div>
           <button class="icon-button" id="clear-filters" type="button" title="Limpar filtros" aria-label="Limpar filtros">&#8635;</button>
-          <label class="file-button" for="csv-input">
-            Carregar CSV
-            <input id="csv-input" type="file" accept=".csv,text/csv" />
-          </label>
         </div>
 
         <div class="cards" id="summary-cards">
@@ -746,7 +742,6 @@
       const tableTitle = document.getElementById("table-title");
       const footerNote = document.getElementById("footer-note");
       const todayDate = document.getElementById("today-date");
-      const csvInput = document.getElementById("csv-input");
       const searchRegional = document.getElementById("search-regional");
       const tabSeduc = document.getElementById("tab-seduc");
       const tabUre = document.getElementById("tab-ure");
@@ -1369,18 +1364,6 @@
         renderDashboard();
       });
       filterEscola.addEventListener("change", renderDashboard);
-
-      csvInput.addEventListener("change", async (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          loadFromText(text, file.name);
-        } catch (error) {
-          renderNotice("Nao foi possivel ler o CSV selecionado.");
-          footerNote.textContent = "";
-        }
-      });
 
       renderHead();
       loadDashboard();
