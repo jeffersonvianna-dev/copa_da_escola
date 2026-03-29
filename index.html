@@ -148,8 +148,8 @@
     }
     .multi-options { display: grid; gap: 3px; max-height: 210px; overflow: auto; }
     .multi-option {
-      display: flex; align-items: center; gap: 10px;
-      padding: 7px 10px; border-radius: 8px;
+      display: flex; align-items: center; gap: 14px;
+      padding: 8px 12px; border-radius: 8px;
       cursor: pointer; font-size: 14px;
       transition: background .18s; user-select: none;
     }
@@ -191,9 +191,9 @@
     }
     .card:hover { box-shadow: var(--shadow-lg); }
     .card-label {
-      font-size: 10px; font-weight: 800;
+      font-size: 11px; font-weight: 800;
       letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--text-muted); margin-bottom: 8px;
+      color: var(--text); opacity: .55; margin-bottom: 8px;
     }
     .card-value {
       font-size: 26px; font-weight: 900;
@@ -233,8 +233,8 @@
     .table-wrap { overflow-x: auto; }
     table { width: 100%; min-width: 860px; border-collapse: collapse; }
     thead th {
-      background: var(--blue-pale); color: var(--blue);
-      font-size: 11px; font-weight: 800;
+      background: var(--blue-mid); color: var(--blue);
+      font-size: 12px; font-weight: 900;
       letter-spacing: 0.08em; text-transform: uppercase;
       padding: 12px 16px; text-align: left;
       white-space: nowrap; cursor: pointer;
@@ -268,7 +268,7 @@
     .score-badge {
       display: inline-block; padding: 4px 10px;
       border-radius: 99px;
-      background: var(--blue-pale); color: var(--blue);
+      background: var(--orange); color: var(--white);
       font-weight: 900; font-size: 13px;
     }
 
@@ -537,8 +537,8 @@
        Serie
     ================================================================ */
     const SERIE_LABELS = {
-      '6': '6o ano', '7': '7o ano', '8': '8o ano', '9': '9o ano',
-      '1': '1a serie', '2': '2a serie', '3': '3a serie',
+      '6': '6\u00BA ano', '7': '7\u00BA ano', '8': '8\u00BA ano', '9': '9\u00BA ano',
+      '1': '1\u00AA s\u00E9rie', '2': '2\u00AA s\u00E9rie', '3': '3\u00AA s\u00E9rie',
     };
     function serieLabel(v) { return SERIE_LABELS[String(v)] || String(v); }
     function orderedSeries(rows) {
@@ -551,9 +551,13 @@
     }
     function updateSerieTrigger() {
       const sel = selectedSeries();
-      serieTrigger.textContent = (!sel.length || sel.length === state.seriesOptions.length)
-        ? 'Todos'
-        : sel.map(serieLabel).join(', ');
+      if (!sel.length || sel.length === state.seriesOptions.length) {
+        serieTrigger.textContent = 'Todos';
+      } else if (sel.length === 1) {
+        serieTrigger.textContent = serieLabel(sel[0]);
+      } else {
+        serieTrigger.textContent = 'Sele\u00E7\u00F5es m\u00FAltiplas (' + sel.length + ')';
+      }
     }
 
     /* ================================================================
