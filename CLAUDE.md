@@ -71,6 +71,22 @@ Usa o **Design System da Cactus Tech** (tema claro/institucional):
 - Fonte: `'Segoe UI', system-ui, sans-serif`
 - Espaçamentos e componentes alinhados com o Guia Priorizado 2026
 
+### Alinhamento do header (PADRÃO)
+
+```css
+.header { background: var(--blue); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10; }
+.header-inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+```
+```html
+<header class="header">
+  <div class="header-inner">
+    <!-- logo, título, stamp -->
+  </div>
+</header>
+```
+A faixa azul é full-width; `.header-inner` contém o conteúdo no mesmo max-width do corpo (1200px).
+
 ## Atualização de dados
 
 Para atualizar os dados no Supabase:
