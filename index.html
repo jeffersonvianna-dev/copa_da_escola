@@ -33,15 +33,19 @@
     /* ── Header ── */
     .header {
       background: var(--blue);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
       padding: 16px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
     .header-left {
       display: flex;
@@ -310,14 +314,16 @@
 <body>
 
   <header class="header">
-    <div class="header-left">
-      <img src="./assets/logo-copa-da-escola.png" alt="Copa da Escola" class="header-logo">
-      <div class="header-title">
-        <h1>Copa da Escola</h1>
-        <p>Painel para URE</p>
+    <div class="header-inner">
+      <div class="header-left">
+        <img src="./assets/logo-copa-da-escola.png" alt="Copa da Escola" class="header-logo">
+        <div class="header-title">
+          <h1>Copa da Escola</h1>
+          <p>Painel para URE</p>
+        </div>
       </div>
+      <div class="header-stamp">Atualizado em <strong id="today-date"></strong></div>
     </div>
-    <div class="header-stamp">Atualizado em <strong id="today-date"></strong></div>
   </header>
 
   <main class="page">
