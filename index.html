@@ -409,7 +409,7 @@
     const SCHEMA   = '2026_copa_da_escola';
     const TABLE    = 'resultados_turmas';
     const PAGE_SIZE = 1000;
-    const DEFAULT_FILTERS = { fase: '1', rodada: '1' };
+    const FALLBACK_FILTERS = { fase: '1', rodada: '1' };
 
     /* ================================================================
        Colunas das tabelas
@@ -447,9 +447,11 @@
     ================================================================ */
     const state = {
       rawRows:       [],
+      filterCatalog: [],
       groupedRows:   [],
       seriesOptions: [],
       activeView:    'seduc',
+      defaultFilters: { ...FALLBACK_FILTERS },
       sort: { key: 'pontuacao', direction: 'desc' },
     };
 
@@ -520,6 +522,42 @@
       return all;
     }
 
+    async function fetchFilterPage(offset, withCount) {
+      const url = SUPABASE_URL + '/rest/v1/' + TABLE
+        + '?select=fase,rodada'
+        + '&limit=' + PAGE_SIZE
+        + '&offset=' + offset;
+      const headers = {
+        'apikey':         SUPABASE_KEY,
+        'Authorization':  'Bearer ' + SUPABASE_KEY,
+        'Accept-Profile': SCHEMA,
+      };
+      if (withCount) headers['Prefer'] = 'count=exact';
+      const resp = await fetch(url, { headers });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const total = withCount
+        ? parseInt((resp.headers.get('Content-Range') || '').split('/')[1] || '0', 10)
+        : 0;
+      return { data: await resp.json(), total };
+    }
+
+    async function fetchAllFilterRows() {
+      const { data: first, total } = await fetchFilterPage(0, true);
+      if (!total || total <= PAGE_SIZE) return first;
+      const offsets = [];
+      for (let o = PAGE_SIZE; o < total; o += PAGE_SIZE) offsets.push(o);
+      const BATCH = 10;
+      const all = [...first];
+      for (let i = 0; i < offsets.length; i += BATCH) {
+        const batch = offsets.slice(i, i + BATCH);
+        const pages = await Promise.all(
+          batch.map(function(o) { return fetchFilterPage(o, false).then(function(r) { return r.data; }); })
+        );
+        pages.forEach(function(p) { all.push.apply(all, p); });
+      }
+      return all;
+    }
+
     /* ================================================================
        Helpers de calculo
     ================================================================ */
@@ -575,16 +613,56 @@
         ? vals.sort(function(a, b) { return Number(a) - Number(b); })
         : vals.sort(function(a, b) { return String(a).localeCompare(String(b), 'pt-BR'); });
     }
-    function fillSelect(sel, values, defVal) {
-      sel.innerHTML = values.map(function(v) { return '<option value="' + v + '">' + v + '</option>'; }).join('');
+    function phaseLabel(value) {
+      const labels = {
+        '1': '1 - Classificat\u00F3ria',
+        '2': '2 - Grupos',
+      };
+      return labels[String(value)] || String(value);
+    }
+    function lastVal(values) {
+      return values.length ? String(values[values.length - 1]) : '';
+    }
+    function fillSelect(sel, values, defVal, labelFn) {
+      sel.innerHTML = values.map(function(v) {
+        const label = labelFn ? labelFn(v) : v;
+        return '<option value="' + v + '">' + label + '</option>';
+      }).join('');
       if (defVal !== undefined) sel.value = String(defVal);
       if (!sel.value && sel.options.length) sel.value = sel.options[0].value;
     }
 
-    function buildFilters(rows, currentFase, currentRodada) {
-      fillSelect(filterFase,   uniqueVals(rows, 'fase',   true), currentFase);
-      fillSelect(filterRodada, uniqueVals(rows, 'rodada', true), currentRodada);
-      fillSelect(filterUre, uniqueVals(rows, 'nm_diretoria', false), '');
+    function rodadasForFase(fase) {
+      const scoped = state.filterCatalog.filter(function(r) {
+        return String(r.fase) === String(fase);
+      });
+      return uniqueVals(scoped, 'rodada', true);
+    }
+
+    function resolveDefaultFilters() {
+      const fases = uniqueVals(state.filterCatalog, 'fase', true);
+      const fase = lastVal(fases) || FALLBACK_FILTERS.fase;
+      const rodadas = rodadasForFase(fase);
+      const rodada = lastVal(rodadas) || FALLBACK_FILTERS.rodada;
+      return { fase, rodada };
+    }
+
+    function syncGlobalFilters(preferredFase, preferredRodada) {
+      const fases = uniqueVals(state.filterCatalog, 'fase', true);
+      const faseFallback = lastVal(fases) || state.defaultFilters.fase || FALLBACK_FILTERS.fase;
+      fillSelect(filterFase, fases, preferredFase || faseFallback, phaseLabel);
+
+      const faseAtual = filterFase.value || faseFallback;
+      const rodadas = rodadasForFase(faseAtual);
+      const rodadaFallback = lastVal(rodadas) || state.defaultFilters.rodada || FALLBACK_FILTERS.rodada;
+      const rodadaPreferida = rodadas.map(String).includes(String(preferredRodada))
+        ? String(preferredRodada)
+        : rodadaFallback;
+      fillSelect(filterRodada, rodadas, rodadaPreferida);
+    }
+
+    function buildScopedFilters(rows) {
+      fillSelect(filterUre, uniqueVals(rows, 'nm_diretoria', false), filterUre.value);
       fillSchoolSelect(rows, filterUre.value);
       state.seriesOptions = orderedSeries(rows);
       serieOptions.innerHTML = state.seriesOptions.map(function(v) {
@@ -805,15 +883,15 @@
        Carregamento de dados do Supabase
     ================================================================ */
     async function loadDashboard() {
-      const fase   = filterFase.value   || DEFAULT_FILTERS.fase;
-      const rodada = filterRodada.value || DEFAULT_FILTERS.rodada;
+      const fase   = filterFase.value   || state.defaultFilters.fase || FALLBACK_FILTERS.fase;
+      const rodada = filterRodada.value || state.defaultFilters.rodada || FALLBACK_FILTERS.rodada;
 
       tableBody.innerHTML    = '<tr><td colspan="8"><div class="loading-wrap"><div class="spinner"></div><br>Carregando dados...</div></td></tr>';
       summaryCards.innerHTML = '<div class="card" style="grid-column:1/-1"><div class="loading-wrap"><div class="spinner"></div></div></div>';
 
       try {
         state.rawRows = await fetchAllRows(fase, rodada);
-        buildFilters(state.rawRows, fase, rodada);
+        buildScopedFilters(state.rawRows);
         state.sort = { key: 'pontuacao', direction: 'desc' };
         searchInput.value = '';
         renderDashboard();
@@ -828,9 +906,11 @@
     /* ================================================================
        Eventos
     ================================================================ */
-    [filterFase, filterRodada].forEach(function(sel) {
-      sel.addEventListener('change', loadDashboard);
+    filterFase.addEventListener('change', function() {
+      syncGlobalFilters(filterFase.value, filterRodada.value);
+      loadDashboard();
     });
+    filterRodada.addEventListener('change', loadDashboard);
 
     $('clear-filters').addEventListener('click', function() {
       serieOptions.querySelectorAll('input').forEach(function(i) { i.checked = false; });
@@ -838,8 +918,7 @@
       seriePanel.classList.remove('open');
       searchInput.value  = '';
       state.sort         = { key: 'pontuacao', direction: 'desc' };
-      filterFase.value   = DEFAULT_FILTERS.fase;
-      filterRodada.value = DEFAULT_FILTERS.rodada;
+      syncGlobalFilters(state.defaultFilters.fase, state.defaultFilters.rodada);
       loadDashboard();
     });
 
@@ -890,8 +969,24 @@
     /* ================================================================
        Init
     ================================================================ */
+    async function initDashboard() {
+      tableBody.innerHTML    = '<tr><td colspan="8"><div class="loading-wrap"><div class="spinner"></div><br>Conectando ao Supabase...</div></td></tr>';
+      summaryCards.innerHTML = '<div class="card" style="grid-column:1/-1"><div class="loading-wrap"><div class="spinner"></div></div></div>';
+
+      try {
+        state.filterCatalog = await fetchAllFilterRows();
+        state.defaultFilters = resolveDefaultFilters();
+        syncGlobalFilters(state.defaultFilters.fase, state.defaultFilters.rodada);
+        await loadDashboard();
+      } catch (err) {
+        tableBody.innerHTML    = '<tr><td colspan="8"><div class="notice error">Erro ao carregar dados: ' + err.message + '</div></td></tr>';
+        summaryCards.innerHTML = '<div class="notice error" style="grid-column:1/-1">Erro ao conectar com o Supabase.</div>';
+        footerNote.textContent = '';
+      }
+    }
+
     renderHead();
-    loadDashboard();
+    initDashboard();
   </script>
 </body>
 </html>
