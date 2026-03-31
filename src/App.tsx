@@ -7,7 +7,9 @@ import DataTable from './components/DataTable';
 import { COLUMNS, type ActiveView } from './components/tableColumns';
 import {
   fetchAvailablePhaseRounds,
-  fetchDashboardFilters,
+  fetchDashboardEscolas,
+  fetchDashboardRegionals,
+  fetchDashboardSeries,
   fetchEscolaView,
   fetchSeducView,
   fetchUreView,
@@ -88,21 +90,27 @@ export default function App() {
     return availableRodadas.includes(rodada) ? rodada : availableRodadas[0];
   }, [availableRodadas, rodada]);
 
-  const { data: rawFilters = [], isLoading: isLoadingFilters } = useQuery({
-    queryKey: ['filters', resolvedFase, resolvedRodada],
-    queryFn: () => fetchDashboardFilters(resolvedFase, resolvedRodada),
+  const { data: seriesData = [], isLoading: isLoadingSeries } = useQuery({
+    queryKey: ['series', resolvedFase, resolvedRodada],
+    queryFn: () => fetchDashboardSeries(resolvedFase, resolvedRodada),
     enabled: Boolean(resolvedFase && resolvedRodada),
   });
 
   const availableSeries = useMemo(() => {
     const order = ['6', '7', '8', '9', '1', '2', '3'];
-    const available = new Set(rawFilters.map((item) => String(item.serie)).filter(Boolean));
+    const available = new Set(seriesData.map((item) => String(item.serie)).filter(Boolean));
     return order.filter((value) => available.has(value));
-  }, [rawFilters]);
+  }, [seriesData]);
+
+  const { data: regionalData = [], isLoading: isLoadingRegionals } = useQuery({
+    queryKey: ['regionals', resolvedFase, resolvedRodada],
+    queryFn: () => fetchDashboardRegionals(resolvedFase, resolvedRodada),
+    enabled: Boolean(resolvedFase && resolvedRodada),
+  });
 
   const regionals = useMemo(() => {
-    return Array.from(new Set(rawFilters.map((item) => item.regional).filter(Boolean))).sort() as string[];
-  }, [rawFilters]);
+    return regionalData.map((item) => item.regional).filter(Boolean).sort() as string[];
+  }, [regionalData]);
 
   const resolvedRegional = useMemo(() => {
     if (regionals.length === 0) {
@@ -112,16 +120,15 @@ export default function App() {
     return regionals.includes(selectedRegional) ? selectedRegional : regionals[0];
   }, [regionals, selectedRegional]);
 
+  const { data: escolaData = [], isLoading: isLoadingEscolas } = useQuery({
+    queryKey: ['escolas', resolvedFase, resolvedRodada, resolvedRegional],
+    queryFn: () => fetchDashboardEscolas(resolvedFase, resolvedRodada, resolvedRegional),
+    enabled: Boolean(resolvedFase && resolvedRodada && resolvedRegional),
+  });
+
   const escolas = useMemo(() => {
-    return Array.from(
-      new Set(
-        rawFilters
-          .filter((item) => item.regional === resolvedRegional)
-          .map((item) => item.escola)
-          .filter(Boolean)
-      )
-    ).sort() as string[];
-  }, [rawFilters, resolvedRegional]);
+    return escolaData.map((item) => item.escola).filter(Boolean).sort() as string[];
+  }, [escolaData]);
 
   const resolvedEscola = useMemo(() => {
     if (escolas.length === 0) {
@@ -159,7 +166,7 @@ export default function App() {
     enabled: Boolean(resolvedFase && resolvedRodada),
   });
 
-  const isLoading = isLoadingMoments || isLoadingFilters || isLoadingData;
+  const isLoading = isLoadingMoments || isLoadingSeries || isLoadingRegionals || isLoadingEscolas || isLoadingData;
 
   const visibleData = useMemo(() => {
     let rows: AggRow[] = [...rawViewData];
