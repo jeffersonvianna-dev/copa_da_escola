@@ -31,12 +31,31 @@ export async function fetchAvailablePhaseRounds(): Promise<PhaseRoundOption[]> {
 }
 
 export async function fetchDashboardFilters(fase: string | number, rodada: string | number): Promise<FilterOption[]> {
-  const { data, error } = await supabase.rpc('get_dashboard_filters', {
-    p_fase: Number(fase),
-    p_rodada: Number(rodada)
-  });
-  if (error) throw error;
-  return data || [];
+  const pageSize = 1000;
+  const allRows: FilterOption[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .rpc('get_dashboard_filters', {
+        p_fase: Number(fase),
+        p_rodada: Number(rodada),
+      })
+      .range(from, from + pageSize - 1);
+
+    if (error) throw error;
+
+    const batch = data || [];
+    allRows.push(...batch);
+
+    if (batch.length < pageSize) {
+      break;
+    }
+
+    from += pageSize;
+  }
+
+  return allRows;
 }
 
 export async function fetchSeducView(fase: string | number, rodada: string | number, series: number[]): Promise<AggRow[]> {
