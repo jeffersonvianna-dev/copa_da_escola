@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import FilterSelect from './components/FilterSelect';
 import Header from './components/Header';
 import SummaryCards from './components/SummaryCards';
 import DataTable from './components/DataTable';
@@ -348,29 +349,25 @@ export default function App() {
 
             <div className="table-filters" style={{ display: activeView !== 'seduc' ? 'flex' : 'none' }}>
               {(activeView === 'ure' || activeView === 'escola') && (
-                <div className="field field-inline">
-                  <label>Regional</label>
-                  <select value={resolvedRegional} onChange={(event) => setSelectedRegional(event.target.value)}>
-                    {regionals.map((regional) => (
-                      <option key={regional} value={regional}>
-                        {regional}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FilterSelect
+                  label="Regional"
+                  options={regionals}
+                  value={resolvedRegional}
+                  onChange={setSelectedRegional}
+                  placeholder="Selecione uma regional"
+                  searchPlaceholder="Buscar regional..."
+                />
               )}
 
               {activeView === 'escola' && (
-                <div className="field field-inline">
-                  <label>Escola</label>
-                  <select value={resolvedEscola} onChange={(event) => setSelectedEscola(event.target.value)}>
-                    {escolas.map((escola) => (
-                      <option key={escola} value={escola}>
-                        {escola}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FilterSelect
+                  label="Escola"
+                  options={escolas}
+                  value={resolvedEscola}
+                  onChange={setSelectedEscola}
+                  placeholder="Selecione uma escola"
+                  searchPlaceholder="Buscar escola..."
+                />
               )}
             </div>
           </div>
