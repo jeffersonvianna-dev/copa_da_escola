@@ -1,0 +1,3 @@
+-- Seed opcional.
+-- Os dados legados podem ser importados com:
+-- python scripts/migrate.py --url https://aingjvjyqhijogpyikii.supabase.co --key SUA_SERVICE_ROLE_KEY --schema 2026_copa_da_escola --table resultados_turmas
