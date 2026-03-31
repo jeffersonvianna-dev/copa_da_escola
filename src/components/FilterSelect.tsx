@@ -80,7 +80,7 @@ export default function FilterSelect({
           />
 
           <div className="combobox-meta">
-            {visibleOptions.length} de {options.length} opcoes
+            {visibleOptions.length} de {options.length} opcoes{options.length > 8 ? ' - role para ver mais' : ''}
           </div>
 
           <div className="combobox-list" id={listboxId} role="listbox" aria-label={label}>

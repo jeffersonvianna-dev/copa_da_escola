@@ -279,10 +279,12 @@
       margin-bottom: 8px;
     }
     .combobox-list {
-      max-height: 280px;
-      overflow: auto;
+      max-height: min(420px, 60vh);
+      overflow-y: scroll;
       display: grid;
       gap: 4px;
+      padding-right: 4px;
+      scrollbar-gutter: stable;
     }
     .combobox-option {
       width: 100%;
