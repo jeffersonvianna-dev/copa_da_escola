@@ -1,7 +1,5 @@
-
-
 export default function Header() {
-  const today = new Intl.DateTimeFormat('pt-BR').format(new Date());
+  const lastUpdated = '30 de março de 2026';
 
   return (
     <header className="header">
@@ -14,7 +12,7 @@ export default function Header() {
           </div>
         </div>
         <div className="header-stamp">
-          Atualizado em <strong>{today}</strong>
+          Atualizado em <strong>{lastUpdated}</strong>
         </div>
       </div>
     </header>

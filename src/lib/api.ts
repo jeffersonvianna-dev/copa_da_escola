@@ -6,6 +6,11 @@ export interface FilterOption {
   serie: number | null;
 }
 
+export interface PhaseRoundOption {
+  fase: number | null;
+  rodada: number | null;
+}
+
 export interface AggRow {
   [key: string]: string | number | null | undefined;
   regional?: string;
@@ -17,6 +22,12 @@ export interface AggRow {
   frequencia: number;
   tarefas: number;
   acertos: number;
+}
+
+export async function fetchAvailablePhaseRounds(): Promise<PhaseRoundOption[]> {
+  const { data, error } = await supabase.rpc('get_available_phase_rounds');
+  if (error) throw error;
+  return data || [];
 }
 
 export async function fetchDashboardFilters(fase: string | number, rodada: string | number): Promise<FilterOption[]> {
